@@ -1,5 +1,6 @@
 package devpub.blogengine.controller
 
+import devpub.blogengine.model.DetailedPostResponse
 import devpub.blogengine.model.ModeratedPostPageRequest
 import devpub.blogengine.model.ModeratedPostPageResponse
 import devpub.blogengine.model.PostPageByDateRequest
@@ -9,8 +10,10 @@ import devpub.blogengine.model.PostPageForCurrentUserRequest
 import devpub.blogengine.model.PostPageRequest
 import devpub.blogengine.model.PostPageResponse
 import devpub.blogengine.service.PostPageService
+import devpub.blogengine.service.PostService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
@@ -18,7 +21,8 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("api/post")
 open class ApiPostController @Autowired constructor(
-    private val postPageService: PostPageService
+    private val postPageService: PostPageService,
+    private val postService: PostService
 ) {
     @GetMapping
     open fun getPage(request: PostPageRequest): PostPageResponse {
@@ -48,5 +52,10 @@ open class ApiPostController @Autowired constructor(
     @GetMapping("moderation")
     open fun getPageForModeration(request: ModeratedPostPageRequest): ModeratedPostPageResponse {
         return postPageService.getForModeration(request)
+    }
+
+    @GetMapping("{id}")
+    open fun getDetails(@PathVariable("id") id: Int): DetailedPostResponse {
+        return postService.getDetails(id)
     }
 }
