@@ -3,6 +3,7 @@ package devpub.blogengine.controller
 import devpub.blogengine.model.PostPageByDateRequest
 import devpub.blogengine.model.PostPageBySearchQueryRequest
 import devpub.blogengine.model.PostPageByTagRequest
+import devpub.blogengine.model.PostPageForCurrentUserRequest
 import devpub.blogengine.model.PostPageRequest
 import devpub.blogengine.model.PostPageResponse
 import devpub.blogengine.service.PostPageService
@@ -35,5 +36,10 @@ open class ApiPostController @Autowired constructor(
     @GetMapping("byTag")
     open fun getPageByTag(@Valid request: PostPageByTagRequest): PostPageResponse {
         return postPageService.getByTag(request)
+    }
+
+    @GetMapping("my")
+    open fun getPageForCurrentUser(request: PostPageForCurrentUserRequest): PostPageResponse {
+        return postPageService.getForCurrentUser(request)
     }
 }
