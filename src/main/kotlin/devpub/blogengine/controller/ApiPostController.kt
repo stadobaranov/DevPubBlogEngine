@@ -2,6 +2,7 @@ package devpub.blogengine.controller
 
 import devpub.blogengine.model.PostPageByDateRequest
 import devpub.blogengine.model.PostPageBySearchQueryRequest
+import devpub.blogengine.model.PostPageByTagRequest
 import devpub.blogengine.model.PostPageRequest
 import devpub.blogengine.model.PostPageResponse
 import devpub.blogengine.service.PostPageService
@@ -29,5 +30,10 @@ open class ApiPostController @Autowired constructor(
     @GetMapping("byDate")
     open fun getPageByDate(@Valid request: PostPageByDateRequest): PostPageResponse {
         return postPageService.getByDate(request)
+    }
+
+    @GetMapping("byTag")
+    open fun getPageByTag(@Valid request: PostPageByTagRequest): PostPageResponse {
+        return postPageService.getByTag(request)
     }
 }
