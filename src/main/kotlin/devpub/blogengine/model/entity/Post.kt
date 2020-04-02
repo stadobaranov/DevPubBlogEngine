@@ -13,6 +13,14 @@ import javax.persistence.Table
 @Entity
 @Table(name = "posts")
 open class Post(id: Int = 0): Persistent(id) {
+    companion object {
+        const val MIN_TITLE_LENGTH = 10
+        const val MAX_TITLE_LENGTH = 255
+
+        const val MIN_TEXT_LENGTH = 500
+        const val MAX_TEXT_LENGTH = 65535
+    }
+
     open lateinit var title: String
 
     @Column(columnDefinition = "text")

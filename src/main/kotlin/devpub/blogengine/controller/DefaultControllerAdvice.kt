@@ -2,6 +2,8 @@ package devpub.blogengine.controller
 
 import devpub.blogengine.ApplicationMessages
 import devpub.blogengine.model.MessageResponse
+import devpub.blogengine.service.exception.ModelIntegrityException
+import devpub.blogengine.service.exception.ModelNotFoundException
 import devpub.blogengine.service.exception.UnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.TypeMismatchException
@@ -36,6 +38,8 @@ open class DefaultControllerAdvice {
     open fun handleException(exception: Exception, request: HttpServletRequest, response: HttpServletResponse): Any {
         return when(exception) {
             is UnauthorizedException -> buildResponseForUnauthorized()
+            is ModelIntegrityException -> buildResponseForBadRequest()
+            is ModelNotFoundException -> buildResponseForNotFound()
             is BindException -> buildResponseForBadRequest()
             is MethodArgumentNotValidException -> buildResponseForBadRequest()
             is HttpMessageNotReadableException -> buildResponseForBadRequest()
@@ -59,6 +63,10 @@ open class DefaultControllerAdvice {
     private fun buildResponseForBadRequest(): ResponseEntity<Any> {
         return ResponseEntity.badRequest()
                              .body(MessageResponse(ApplicationMessages.BAD_REQUEST))
+    }
+
+    private fun buildResponseForNotFound(): ResponseEntity<Any> {
+        return buildEmptyResponse(HttpStatus.NOT_FOUND)
     }
 
     private fun buildResponseForMethodNotAllowed(): ResponseEntity<Any> {
