@@ -8,4 +8,6 @@ object ApplicationMessages {
     const val ANNOUNCE_IS_TOO_SHORT = "Анонс слишком короткий"
 
     const val UNAUTHORIZED = "Доступ запрещен"
+
+    const val FIELD_IS_REQUIRED = "Необходимо для заполнения"
 }
