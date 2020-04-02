@@ -2,6 +2,7 @@ package devpub.blogengine.controller
 
 import devpub.blogengine.ApplicationMessages
 import devpub.blogengine.model.MessageResponse
+import devpub.blogengine.service.exception.UnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.TypeMismatchException
 import org.springframework.beans.propertyeditors.StringTrimmerEditor
@@ -34,6 +35,7 @@ open class DefaultControllerAdvice {
     @ExceptionHandler(Exception::class)
     open fun handleException(exception: Exception, request: HttpServletRequest, response: HttpServletResponse): Any {
         return when(exception) {
+            is UnauthorizedException -> buildResponseForUnauthorized()
             is BindException -> buildResponseForBadRequest()
             is MethodArgumentNotValidException -> buildResponseForBadRequest()
             is HttpMessageNotReadableException -> buildResponseForBadRequest()
@@ -48,6 +50,10 @@ open class DefaultControllerAdvice {
                 buildEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR)
             }
         }
+    }
+
+    private fun buildResponseForUnauthorized(): ResponseEntity<Any> {
+        return buildEmptyResponse(HttpStatus.UNAUTHORIZED)
     }
 
     private fun buildResponseForBadRequest(): ResponseEntity<Any> {
