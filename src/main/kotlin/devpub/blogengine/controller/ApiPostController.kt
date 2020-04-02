@@ -1,5 +1,6 @@
 package devpub.blogengine.controller
 
+import devpub.blogengine.model.PostPageBySearchQueryRequest
 import devpub.blogengine.model.PostPageRequest
 import devpub.blogengine.model.PostPageResponse
 import devpub.blogengine.service.PostPageService
@@ -16,5 +17,10 @@ open class ApiPostController @Autowired constructor(
     @GetMapping
     open fun getPage(request: PostPageRequest): PostPageResponse {
         return postPageService.get(request)
+    }
+
+    @GetMapping("search")
+    open fun getPageBySearchQuery(request: PostPageBySearchQueryRequest): PostPageResponse {
+        return postPageService.getBySearchQuery(request)
     }
 }
