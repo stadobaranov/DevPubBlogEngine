@@ -2,6 +2,7 @@ package devpub.blogengine.controller
 
 import devpub.blogengine.model.CommentPostRequest
 import devpub.blogengine.model.InitResponse
+import devpub.blogengine.model.ModeratePostRequest
 import devpub.blogengine.model.PostCountToDatesRequest
 import devpub.blogengine.model.PostCountToDatesResponse
 import devpub.blogengine.service.PostService
@@ -45,5 +46,10 @@ open class ApiGeneralController @Autowired constructor(
         }
 
         return postService.comment(request)
+    }
+
+    @PostMapping("moderation")
+    open fun moderate(@Valid @RequestBody request: ModeratePostRequest) {
+        postService.moderate(request)
     }
 }
