@@ -1,5 +1,7 @@
 package devpub.blogengine.controller
 
+import devpub.blogengine.model.ModeratedPostPageRequest
+import devpub.blogengine.model.ModeratedPostPageResponse
 import devpub.blogengine.model.PostPageByDateRequest
 import devpub.blogengine.model.PostPageBySearchQueryRequest
 import devpub.blogengine.model.PostPageByTagRequest
@@ -41,5 +43,10 @@ open class ApiPostController @Autowired constructor(
     @GetMapping("my")
     open fun getPageForCurrentUser(request: PostPageForCurrentUserRequest): PostPageResponse {
         return postPageService.getForCurrentUser(request)
+    }
+
+    @GetMapping("moderation")
+    open fun getPageForModeration(request: ModeratedPostPageRequest): ModeratedPostPageResponse {
+        return postPageService.getForModeration(request)
     }
 }
