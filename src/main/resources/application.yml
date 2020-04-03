@@ -1,4 +1,6 @@
 blog-engine:
+  host: http://localhost:8080/
+
   transaction-repeating:
     max-attempts: 50
     min-delay: 50
