@@ -2,11 +2,13 @@ package devpub.blogengine.controller
 
 import devpub.blogengine.ApplicationMessages
 import devpub.blogengine.model.MessageResponse
+import devpub.blogengine.service.ExceptionHandlingService
 import devpub.blogengine.service.exception.ModelIntegrityException
 import devpub.blogengine.service.exception.ModelNotFoundException
 import devpub.blogengine.service.exception.UnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.TypeMismatchException
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.propertyeditors.StringTrimmerEditor
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -28,7 +30,9 @@ import javax.servlet.http.HttpServletResponse
 private val logger = LoggerFactory.getLogger(DefaultControllerAdvice::class.java)
 
 @ControllerAdvice
-open class DefaultControllerAdvice {
+open class DefaultControllerAdvice @Autowired constructor(
+    private val exceptionHandlingService: ExceptionHandlingService
+) {
     @InitBinder
     open fun initDataBinder(dataBinder: WebDataBinder) {
         dataBinder.registerCustomEditor(String::class.java, StringTrimmerEditor(false))
@@ -36,7 +40,7 @@ open class DefaultControllerAdvice {
 
     @ExceptionHandler(Exception::class)
     open fun handleException(exception: Exception, request: HttpServletRequest, response: HttpServletResponse): Any {
-        return when(exception) {
+        return exceptionHandlingService.handle(exception, request, response) ?: when(exception) {
             is UnauthorizedException -> buildResponseForUnauthorized()
             is ModelIntegrityException -> buildResponseForBadRequest()
             is ModelNotFoundException -> buildResponseForNotFound()
