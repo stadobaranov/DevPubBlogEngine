@@ -2,6 +2,7 @@ package devpub.blogengine.controller
 
 import devpub.blogengine.model.AuthorizedUserResponse
 import devpub.blogengine.model.LoginUserRequest
+import devpub.blogengine.model.ResultResponse
 import devpub.blogengine.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,5 +25,10 @@ open class ApiAuthController @Autowired constructor(
     @PostMapping("login")
     open fun loginUser(@Valid @RequestBody request: LoginUserRequest): AuthorizedUserResponse {
         return userService.login(request)
+    }
+
+    @GetMapping("logout")
+    open fun logoutUser(): ResultResponse {
+        return userService.logout()
     }
 }
