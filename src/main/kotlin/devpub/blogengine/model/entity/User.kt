@@ -8,6 +8,10 @@ import javax.persistence.Table
 @Entity
 @Table(name = "users")
 open class User(id: Int = 0): Persistent(id) {
+    companion object {
+        const val RESET_CODE_LENGTH = 46
+    }
+
     open lateinit var name: String
 
     open lateinit var email: String

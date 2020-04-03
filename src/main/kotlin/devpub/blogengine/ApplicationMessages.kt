@@ -24,6 +24,7 @@ object ApplicationMessages {
     const val INVALID_MAX_POST_COMMENT_TEXT_LENGTH = "Максимально допустимая длина - ${PostComment.MAX_TEXT_LENGTH} символов"
 
     const val POST_NOT_FOUND = "Пост не найден"
+    const val USER_NOT_FOUND = "Пользователь не найден"
 
     const val MISSING_POST = "Пост не существует"
     const val MISSING_POST_AUTHOR = "Автор поста не сущестует"
@@ -31,4 +32,9 @@ object ApplicationMessages {
     const val MISSING_PARENT_COMMENT = "Родительский комментарий не сущестует"
     const val MISSING_POST_MODERATOR = "Модератор поста не сущестует"
     const val MISSING_POST_VOTER = "Голосующий не существует"
+
+    const val DUPLICATE_USER_NAME = "Имя пользователя уже существует"
+    const val DUPLICATE_USER_EMAIL = "Адрес эл. почты уже существует"
+
+    const val USER_RESET_CODE_EXPIRED = "Код восстановления устарел"
 }
