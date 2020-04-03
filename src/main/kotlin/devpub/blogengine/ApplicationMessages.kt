@@ -37,4 +37,7 @@ object ApplicationMessages {
     const val DUPLICATE_USER_EMAIL = "Адрес эл. почты уже существует"
 
     const val USER_RESET_CODE_EXPIRED = "Код восстановления устарел"
+
+    const val CAPTCHA_EXPIRED = "Капча устарела"
+    const val INVALID_CAPTCHA_CODE = "Неправильный код"
 }

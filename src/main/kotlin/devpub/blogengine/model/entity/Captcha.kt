@@ -8,6 +8,12 @@ import javax.persistence.Table
 @Entity
 @Table(name = "captcha_codes")
 open class Captcha(id: Int = 0): Persistent(id) {
+    companion object {
+        const val MIN_CODE_LENGTH = 5
+        const val MAX_CODE_LENGTH = 6
+        const val SECRET_CODE_LENGTH = 46
+    }
+
     @Column(columnDefinition = "tinytext")
     open lateinit var code: String
 

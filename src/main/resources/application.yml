@@ -6,6 +6,8 @@ blog-engine:
     min-delay: 50
     max-delay: 200
 
+  captcha-lifetime: 60
+
   frontend-title: DevPub
   frontend-subtitle: Рассказы разработчиков
   contact-phone: +7 903 666-44-55
