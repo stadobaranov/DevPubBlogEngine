@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TagRepository: BaseRepository<Tag> {
+interface TagRepository: BaseRepository<Tag>, TagRepositoryCustom {
     @Query("""
         select t.name.value
         from Tag t 
