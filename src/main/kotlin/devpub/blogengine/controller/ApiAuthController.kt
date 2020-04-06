@@ -4,7 +4,9 @@ import devpub.blogengine.model.AuthorizedUserResponse
 import devpub.blogengine.model.GenerateCaptchaResponse
 import devpub.blogengine.model.LoginUserRequest
 import devpub.blogengine.model.ResultResponse
+import devpub.blogengine.model.SendUserResetCodeRequest
 import devpub.blogengine.service.CaptchaService
+import devpub.blogengine.service.UserPasswordResetService
 import devpub.blogengine.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,7 +20,8 @@ import javax.validation.Valid
 @RequestMapping("api/auth")
 open class ApiAuthController @Autowired constructor(
     private val captchaService: CaptchaService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val userPasswordResetService: UserPasswordResetService
 ) {
     @GetMapping("captcha")
     open fun generateCaptcha(): GenerateCaptchaResponse {
@@ -38,5 +41,10 @@ open class ApiAuthController @Autowired constructor(
     @GetMapping("logout")
     open fun logoutUser(): ResultResponse {
         return userService.logout()
+    }
+
+    @PostMapping("restore")
+    open fun restoreUserPassword(@Valid @RequestBody request: SendUserResetCodeRequest): ResultResponse {
+        return userPasswordResetService.sendResetCode(request)
     }
 }
