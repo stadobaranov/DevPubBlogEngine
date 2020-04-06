@@ -30,6 +30,8 @@ object ApplicationMessages {
     const val INVALID_MAX_USER_PASSWORD_LENGTH = "Максимально допустимая длина - ${User.MAX_PASSWORD_LENGTH} символов"
     const val INVALID_IMAGE = "Недопустимое изображение"
 
+    const val MAX_UPLOAD_SIZE_EXCEEDED = "Превышен максимально допустимый размер файла"
+
     const val POST_NOT_FOUND = "Пост не найден"
     const val USER_NOT_FOUND = "Пользователь не найден"
 

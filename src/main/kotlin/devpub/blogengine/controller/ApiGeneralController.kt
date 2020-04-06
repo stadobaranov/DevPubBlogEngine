@@ -1,5 +1,6 @@
 package devpub.blogengine.controller
 
+import devpub.blogengine.ApplicationMessages
 import devpub.blogengine.model.CommentPostRequest
 import devpub.blogengine.model.GlobalSettingsResponse
 import devpub.blogengine.model.InitResponse
@@ -9,15 +10,21 @@ import devpub.blogengine.model.PostCountToDatesResponse
 import devpub.blogengine.model.TagWeightToNamesRequest
 import devpub.blogengine.model.TagWeightToNamesResponse
 import devpub.blogengine.model.UpdateGlobalSettingsRequest
+import devpub.blogengine.model.UpdateUserProfileWithAvatarRequest
+import devpub.blogengine.model.UpdateUserProfileWithoutAvatarRequest
 import devpub.blogengine.model.UploadImageRequest
 import devpub.blogengine.service.ExceptionHandlingService
 import devpub.blogengine.service.GlobalSettingService
 import devpub.blogengine.service.ImageUploadService
 import devpub.blogengine.service.PostService
 import devpub.blogengine.service.TagService
+import devpub.blogengine.service.UserProfileService
 import devpub.blogengine.service.ValidationErrorsResponseMaker
+import devpub.blogengine.service.exception.DuplicateUserEmailException
+import devpub.blogengine.service.exception.DuplicateUserNameException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
@@ -43,6 +50,7 @@ open class ApiGeneralController @Autowired constructor(
     private val postService: PostService,
     private val tagService: TagService,
     private val globalSettingService: GlobalSettingService,
+    private val userProfileService: UserProfileService,
     private val imageUploadService: ImageUploadService,
     private val validationErrorsResponseMaker: ValidationErrorsResponseMaker
 ) {
@@ -102,5 +110,69 @@ open class ApiGeneralController @Autowired constructor(
     @PutMapping("settings")
     open fun updateGlobalSettings(@RequestBody request: UpdateGlobalSettingsRequest) {
         globalSettingService.update(request)
+    }
+
+    @PostConstruct
+    open fun registerExceptionHandlerForUpdateUserProfileWithAvatar() {
+        exceptionHandlingService.register("/api/profile/my") {
+            exception, _, _ -> when(exception) {
+                is MaxUploadSizeExceededException -> ResponseEntity.ok(
+                    validationErrorsResponseMaker.make(
+                        UpdateUserProfileWithAvatarRequest::class,
+                        UpdateUserProfileWithAvatarRequest::avatar.name,
+                        ApplicationMessages.MAX_UPLOAD_SIZE_EXCEEDED
+                    )
+                )
+                else -> null
+            }
+        }
+    }
+
+    @PostMapping("profile/my", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    open fun updateUserProfileWithAvatar(
+        @Valid request: UpdateUserProfileWithAvatarRequest,
+        bResult: BindingResult
+    ): Any {
+        if(bResult.hasFieldErrors()) {
+            return validationErrorsResponseMaker.make(CommentPostRequest::class, bResult.fieldErrors)
+        }
+
+        try {
+            return userProfileService.update(request)
+        }
+        catch(exception: DuplicateUserNameException) {
+            return validationErrorsResponseMaker.make(
+                UpdateUserProfileWithAvatarRequest::class, UpdateUserProfileWithAvatarRequest::name.name, exception.message!!
+            )
+        }
+        catch(exception: DuplicateUserEmailException) {
+            return validationErrorsResponseMaker.make(
+                UpdateUserProfileWithAvatarRequest::class, UpdateUserProfileWithAvatarRequest::email.name, exception.message!!
+            )
+        }
+    }
+
+    @PostMapping("profile/my", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    open fun updateUserProfileWithoutAvatar(
+        @Valid @RequestBody request: UpdateUserProfileWithoutAvatarRequest,
+        bResult: BindingResult
+    ): Any {
+        if(bResult.hasFieldErrors()) {
+            return validationErrorsResponseMaker.make(CommentPostRequest::class, bResult.fieldErrors)
+        }
+
+        try {
+            return userProfileService.update(request)
+        }
+        catch(exception: DuplicateUserNameException) {
+            return validationErrorsResponseMaker.make(
+                UpdateUserProfileWithoutAvatarRequest::class, UpdateUserProfileWithoutAvatarRequest::name.name, exception.message!!
+            )
+        }
+        catch(exception: DuplicateUserEmailException) {
+            return validationErrorsResponseMaker.make(
+                UpdateUserProfileWithoutAvatarRequest::class, UpdateUserProfileWithoutAvatarRequest::email.name, exception.message!!
+            )
+        }
     }
 }
