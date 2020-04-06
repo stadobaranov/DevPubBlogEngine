@@ -94,4 +94,9 @@ open class ApiPostController @Autowired constructor(
     open fun like(@Valid @RequestBody request: VotePostRequest): ResultResponse {
         return postService.like(request)
     }
+
+    @PostMapping("dislike")
+    open fun dislike(@Valid @RequestBody request: VotePostRequest): ResultResponse {
+        return postService.dislike(request)
+    }
 }
