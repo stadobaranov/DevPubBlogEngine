@@ -5,10 +5,13 @@ import devpub.blogengine.model.InitResponse
 import devpub.blogengine.model.ModeratePostRequest
 import devpub.blogengine.model.PostCountToDatesRequest
 import devpub.blogengine.model.PostCountToDatesResponse
+import devpub.blogengine.model.TagWeightToNamesRequest
+import devpub.blogengine.model.TagWeightToNamesResponse
 import devpub.blogengine.model.UploadImageRequest
 import devpub.blogengine.service.ExceptionHandlingService
 import devpub.blogengine.service.ImageUploadService
 import devpub.blogengine.service.PostService
+import devpub.blogengine.service.TagService
 import devpub.blogengine.service.ValidationErrorsResponseMaker
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -34,6 +37,7 @@ open class ApiGeneralController @Autowired constructor(
     @Value("\${blog-engine.copyright-from}") private val copyrightFrom: String,
     private val exceptionHandlingService: ExceptionHandlingService,
     private val postService: PostService,
+    private val tagService: TagService,
     private val imageUploadService: ImageUploadService,
     private val validationErrorsResponseMaker: ValidationErrorsResponseMaker
 ) {
@@ -45,6 +49,11 @@ open class ApiGeneralController @Autowired constructor(
     @GetMapping("calendar")
     open fun getPostCountByDate(request: PostCountToDatesRequest): PostCountToDatesResponse {
         return postService.getCountToDates(request)
+    }
+
+    @GetMapping("tag")
+    open fun getTagWeightToNames(request: TagWeightToNamesRequest): TagWeightToNamesResponse {
+        return tagService.getWeightToNames(request)
     }
 
     @PostMapping("comment")
