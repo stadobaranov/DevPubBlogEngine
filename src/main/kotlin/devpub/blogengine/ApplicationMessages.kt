@@ -42,4 +42,6 @@ object ApplicationMessages {
 
     const val CAPTCHA_EXPIRED = "Капча устарела"
     const val INVALID_CAPTCHA_CODE = "Неправильный код"
+
+    const val INVALID_GLOBAL_SETTING_VALUE = "Недопустимое значение глобальной настройки"
 }
