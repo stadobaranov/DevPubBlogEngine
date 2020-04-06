@@ -17,6 +17,20 @@ blog-engine:
 
   upload-dir: upload/
 
+  global-settings:
+    definitions:
+      MULTIUSER_MODE:
+        default-value: "NO"
+        default-name:
+
+      POST_PREMODERATION:
+        default-value: "YES"
+        default-name:
+
+      STATISTICS_IS_PUBLIC:
+        default-value: "YES"
+        default-name:
+
 spring:
   datasource:
     url: jdbc:mysql://192.168.99.100:3306/DevPubBlogEngine?serverTimezone=Europe/Moscow
