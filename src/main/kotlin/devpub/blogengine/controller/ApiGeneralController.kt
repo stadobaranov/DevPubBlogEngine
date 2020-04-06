@@ -1,6 +1,7 @@
 package devpub.blogengine.controller
 
 import devpub.blogengine.model.CommentPostRequest
+import devpub.blogengine.model.GlobalSettingsResponse
 import devpub.blogengine.model.InitResponse
 import devpub.blogengine.model.ModeratePostRequest
 import devpub.blogengine.model.PostCountToDatesRequest
@@ -9,6 +10,7 @@ import devpub.blogengine.model.TagWeightToNamesRequest
 import devpub.blogengine.model.TagWeightToNamesResponse
 import devpub.blogengine.model.UploadImageRequest
 import devpub.blogengine.service.ExceptionHandlingService
+import devpub.blogengine.service.GlobalSettingService
 import devpub.blogengine.service.ImageUploadService
 import devpub.blogengine.service.PostService
 import devpub.blogengine.service.TagService
@@ -38,6 +40,7 @@ open class ApiGeneralController @Autowired constructor(
     private val exceptionHandlingService: ExceptionHandlingService,
     private val postService: PostService,
     private val tagService: TagService,
+    private val globalSettingService: GlobalSettingService,
     private val imageUploadService: ImageUploadService,
     private val validationErrorsResponseMaker: ValidationErrorsResponseMaker
 ) {
@@ -87,5 +90,10 @@ open class ApiGeneralController @Autowired constructor(
         }
 
         return imageUploadService.upload(request)
+    }
+
+    @GetMapping("settings")
+    open fun getGlobalSettings(): GlobalSettingsResponse {
+        return globalSettingService.get()
     }
 }
