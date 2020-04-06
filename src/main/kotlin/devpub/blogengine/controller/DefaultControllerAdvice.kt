@@ -3,6 +3,7 @@ package devpub.blogengine.controller
 import devpub.blogengine.ApplicationMessages
 import devpub.blogengine.model.MessageResponse
 import devpub.blogengine.service.ExceptionHandlingService
+import devpub.blogengine.service.exception.GlobalSettingValueConversionException
 import devpub.blogengine.service.exception.ModelIntegrityException
 import devpub.blogengine.service.exception.ModelNotFoundException
 import devpub.blogengine.service.exception.UnauthorizedException
@@ -44,6 +45,7 @@ open class DefaultControllerAdvice @Autowired constructor(
             is UnauthorizedException -> buildResponseForUnauthorized()
             is ModelIntegrityException -> buildResponseForBadRequest()
             is ModelNotFoundException -> buildResponseForNotFound()
+            is GlobalSettingValueConversionException -> buildResponseForBadRequest()
             is BindException -> buildResponseForBadRequest()
             is MethodArgumentNotValidException -> buildResponseForBadRequest()
             is HttpMessageNotReadableException -> buildResponseForBadRequest()

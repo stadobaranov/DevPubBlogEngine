@@ -8,6 +8,7 @@ import devpub.blogengine.model.PostCountToDatesRequest
 import devpub.blogengine.model.PostCountToDatesResponse
 import devpub.blogengine.model.TagWeightToNamesRequest
 import devpub.blogengine.model.TagWeightToNamesResponse
+import devpub.blogengine.model.UpdateGlobalSettingsRequest
 import devpub.blogengine.model.UploadImageRequest
 import devpub.blogengine.service.ExceptionHandlingService
 import devpub.blogengine.service.GlobalSettingService
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -95,5 +97,10 @@ open class ApiGeneralController @Autowired constructor(
     @GetMapping("settings")
     open fun getGlobalSettings(): GlobalSettingsResponse {
         return globalSettingService.get()
+    }
+
+    @PutMapping("settings")
+    open fun updateGlobalSettings(@RequestBody request: UpdateGlobalSettingsRequest) {
+        globalSettingService.update(request)
     }
 }
