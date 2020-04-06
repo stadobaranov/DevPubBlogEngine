@@ -9,6 +9,8 @@ import javax.persistence.Table
 @Table(name = "users")
 open class User(id: Int = 0): Persistent(id) {
     companion object {
+        const val MAX_NAME_LENGTH = 255
+        const val MAX_EMAIL_LENGTH = 255
         const val MIN_PASSWORD_LENGTH = 6
         const val MAX_PASSWORD_LENGTH = 32
         const val RESET_CODE_LENGTH = 46
