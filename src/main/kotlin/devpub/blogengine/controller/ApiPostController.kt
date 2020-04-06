@@ -9,7 +9,9 @@ import devpub.blogengine.model.PostPageByTagRequest
 import devpub.blogengine.model.PostPageForCurrentUserRequest
 import devpub.blogengine.model.PostPageRequest
 import devpub.blogengine.model.PostPageResponse
+import devpub.blogengine.model.ResultResponse
 import devpub.blogengine.model.SavePostRequest
+import devpub.blogengine.model.VotePostRequest
 import devpub.blogengine.service.PostPageService
 import devpub.blogengine.service.PostService
 import devpub.blogengine.service.ValidationErrorsResponseMaker
@@ -86,5 +88,10 @@ open class ApiPostController @Autowired constructor(
         }
 
         return postService.update(id, request)
+    }
+
+    @PostMapping("like")
+    open fun like(@Valid @RequestBody request: VotePostRequest): ResultResponse {
+        return postService.like(request)
     }
 }
