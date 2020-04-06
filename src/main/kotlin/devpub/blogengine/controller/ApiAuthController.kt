@@ -3,13 +3,17 @@ package devpub.blogengine.controller
 import devpub.blogengine.model.AuthorizedUserResponse
 import devpub.blogengine.model.GenerateCaptchaResponse
 import devpub.blogengine.model.LoginUserRequest
+import devpub.blogengine.model.RegisterUserRequest
 import devpub.blogengine.model.ResetUserPasswordRequest
 import devpub.blogengine.model.ResultResponse
 import devpub.blogengine.model.SendUserResetCodeRequest
 import devpub.blogengine.service.CaptchaService
 import devpub.blogengine.service.UserPasswordResetService
+import devpub.blogengine.service.UserRegistrationService
 import devpub.blogengine.service.UserService
 import devpub.blogengine.service.ValidationErrorsResponseMaker
+import devpub.blogengine.service.exception.DuplicateUserEmailException
+import devpub.blogengine.service.exception.DuplicateUserNameException
 import devpub.blogengine.service.exception.ProcessingCaptchaException
 import devpub.blogengine.service.exception.UserResetCodeExpiredException
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +31,7 @@ open class ApiAuthController @Autowired constructor(
     private val captchaService: CaptchaService,
     private val userService: UserService,
     private val userPasswordResetService: UserPasswordResetService,
+    private val userRegistrationService: UserRegistrationService,
     private val validationErrorsResponseMaker: ValidationErrorsResponseMaker
 ) {
     @GetMapping("captcha")
@@ -71,6 +76,32 @@ open class ApiAuthController @Autowired constructor(
         catch(exception: UserResetCodeExpiredException) {
             return validationErrorsResponseMaker.make(
                 ResetUserPasswordRequest::class, ResetUserPasswordRequest::resetCode.name, exception.message!!
+            )
+        }
+    }
+
+    @PostMapping("register")
+    open fun registerUser(@Valid @RequestBody request: RegisterUserRequest, bResult: BindingResult): Any {
+        if(bResult.hasFieldErrors()) {
+            return validationErrorsResponseMaker.make(RegisterUserRequest::class, bResult.fieldErrors)
+        }
+
+        try {
+            return userRegistrationService.register(request)
+        }
+        catch(exception: ProcessingCaptchaException) {
+            return validationErrorsResponseMaker.make(
+                RegisterUserRequest::class, RegisterUserRequest::captchaCode.name, exception.message!!
+            )
+        }
+        catch(exception: DuplicateUserNameException) {
+            return validationErrorsResponseMaker.make(
+                RegisterUserRequest::class, RegisterUserRequest::name.name, exception.message!!
+            )
+        }
+        catch(exception: DuplicateUserEmailException) {
+            return validationErrorsResponseMaker.make(
+                RegisterUserRequest::class, RegisterUserRequest::email.name, exception.message!!
             )
         }
     }
