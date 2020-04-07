@@ -11,16 +11,17 @@ private const val MAX_ANNOUNCE_LENGTH = 1000
 
 private const val CUT_LINE = "..."
 
-private const val TAG_REGEX = "</?(?:abbr|b|i|em|q|sub|sup|code|dfn|time|span|br)[^>]*>"
-private const val ANNOUNCE_REGEX = "(?:[^<]+|(?:$TAG_REGEX))+"
-
-private val lastWhitespacePattern = Pattern.compile("(?:\\s*\\S+)*(\\s)")
-
 private val firstParagraphPattern = Pattern.compile(
-    "(?<=^<(p|div)>)$ANNOUNCE_REGEX(?=</\\1>)|^$ANNOUNCE_REGEX(?:(?=<(?:p|div|h[1-6]|[uo]l)>)|$)"
+    "(?:(?<=^<(p|div)>).+?(?=</\\1>))|(?:^[^<].*?(?:(?=<(?:p|div|h[1-6]|[uo]l)>)|$))", Pattern.DOTALL
 )
 
-private val tagPattern = Pattern.compile(TAG_REGEX)
+private val tagPattern = Pattern.compile("</?(\\w+)[^>]*?>")
+
+private var availableTags = hashSetOf(
+    "abbr", "b", "i", "em", "q", "sub", "sup", "code", "dfn", "time", "span", "br"
+)
+
+private val lastWhitespacePattern = Pattern.compile("(?:\\s*\\S+)*(\\s)")
 
 @Service
 open class AnnounceExtractorImpl: AnnounceExtractor {
@@ -35,7 +36,13 @@ open class AnnounceExtractorImpl: AnnounceExtractor {
             throw AnnounceExtractionException(ApplicationMessages.ANNOUNCE_NOT_MATCHED)
         }
 
-        val announce = tagPattern.matcher(firstParagraphMatcher.group()).replaceAll("")
+        val announce = tagPattern.matcher(firstParagraphMatcher.group()).replaceAll {
+            result ->
+                if(result.group(1) !in availableTags)
+                    throw AnnounceExtractionException(ApplicationMessages.ANNOUNCE_NOT_MATCHED)
+
+                return@replaceAll ""
+        }
 
         if(announce.length < MIN_ANNOUNCE_LENGTH) {
             throw AnnounceExtractionException(ApplicationMessages.ANNOUNCE_IS_TOO_SHORT)
