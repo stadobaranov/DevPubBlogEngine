@@ -12,6 +12,7 @@ import devpub.blogengine.model.entity.TagName
 import devpub.blogengine.model.entity.TagToPost
 import devpub.blogengine.model.entity.User
 import devpub.blogengine.model.entity.projection.ModeratedPostSummary
+import devpub.blogengine.model.entity.projection.PostStatistics
 import devpub.blogengine.model.entity.projection.PostSummary
 import devpub.blogengine.model.pagination.UnorderedPageable
 import org.springframework.data.domain.Page
@@ -22,7 +23,6 @@ import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import javax.persistence.criteria.CriteriaBuilder
 import javax.persistence.criteria.CriteriaQuery
-import javax.persistence.criteria.Join
 import javax.persistence.criteria.JoinType
 import javax.persistence.criteria.Predicate
 import javax.persistence.criteria.Root
@@ -199,6 +199,40 @@ open class PostRepositoryImpl(
             val countQuery = RepositoryUtils.toCountQuery(cb, Post::class, postQuery)
             return@loadPage entityManager.createQuery(countQuery).singleResult
         }
+    }
+
+    override fun findStatistics(userId: Int?): PostStatistics {
+        val cb = entityManager.criteriaBuilder
+
+        val postStatisticsQuery = cb.createQuery(PostStatistics::class.java)
+        val post = postStatisticsQuery.from(Post::class.java)
+
+        val likesQuery = postStatisticsQuery.subquery(Long::class.java)
+        val likes = likesQuery.from(PostLike::class.java)
+        likesQuery.select(cb.count(likes))
+
+        val dislikesQuery = postStatisticsQuery.subquery(Long::class.java)
+        val dislikes = dislikesQuery.from(PostDislike::class.java)
+        dislikesQuery.select(cb.count(dislikes))
+
+        postStatisticsQuery.select(
+            cb.construct(
+                PostStatistics::class.java,
+                cb.count(post),
+                likesQuery.selection,
+                dislikesQuery.selection,
+                cb.sum(post.get<Int>("viewCount")),
+                cb.least(post.get<LocalDateTime>("publishedAt"))
+            )
+        )
+
+        if(userId != null) {
+            postStatisticsQuery.where(cb.equal(post.get<User>("author").get<Int>("id"), userId))
+            likesQuery.where(cb.equal(likes.get<User>("voter").get<Int>("id"), userId))
+            dislikesQuery.where(cb.equal(dislikes.get<User>("voter").get<Int>("id"), userId))
+        }
+
+        return entityManager.createQuery(postStatisticsQuery).singleResult
     }
 }
 

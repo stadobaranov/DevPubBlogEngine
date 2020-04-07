@@ -6,6 +6,7 @@ import devpub.blogengine.model.DetailedPostResponse
 import devpub.blogengine.model.ModeratePostRequest
 import devpub.blogengine.model.PostCountToDatesRequest
 import devpub.blogengine.model.PostCountToDatesResponse
+import devpub.blogengine.model.PostStatisticsResponse
 import devpub.blogengine.model.ResultResponse
 import devpub.blogengine.model.SavePostRequest
 import devpub.blogengine.model.VotePostRequest
@@ -14,6 +15,8 @@ interface PostService {
     fun getDetails(id: Int): DetailedPostResponse
 
     fun getCountToDates(request: PostCountToDatesRequest): PostCountToDatesResponse
+
+    fun getStatistics(userId: Int? = null): PostStatisticsResponse
 
     fun create(request: SavePostRequest): ResultResponse
 

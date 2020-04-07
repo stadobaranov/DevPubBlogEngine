@@ -10,6 +10,7 @@ import devpub.blogengine.model.ModerationDecision
 import devpub.blogengine.model.PostAuthor
 import devpub.blogengine.model.PostCountToDatesRequest
 import devpub.blogengine.model.PostCountToDatesResponse
+import devpub.blogengine.model.PostStatisticsResponse
 import devpub.blogengine.model.ResultResponse
 import devpub.blogengine.model.SavePostRequest
 import devpub.blogengine.model.VotePostRequest
@@ -25,6 +26,7 @@ import devpub.blogengine.model.entity.TagName
 import devpub.blogengine.model.entity.TagToPost
 import devpub.blogengine.model.entity.User
 import devpub.blogengine.model.entity.projection.DetailedPostSummary
+import devpub.blogengine.model.entity.projection.PostStatistics
 import devpub.blogengine.repository.PostCommentRepository
 import devpub.blogengine.repository.PostRepository
 import devpub.blogengine.repository.PostVoteRepository
@@ -129,6 +131,23 @@ open class PostServiceImpl @Autowired constructor(
         )
 
         return if(endOfYear > now) now else endOfYear
+    }
+
+    @Transactional(readOnly = true)
+    override fun getStatistics(userId: Int?): PostStatisticsResponse {
+        return createStatisticsResponse(postRepository.findStatistics(userId))
+    }
+
+    private fun createStatisticsResponse(statistics: PostStatistics): PostStatisticsResponse {
+        val firstPublication = statistics.firstPublication
+
+        return PostStatisticsResponse(
+            statistics.postsCount,
+            statistics.likesCount,
+            statistics.dislikesCount,
+            statistics.viewsCount,
+            if(firstPublication != null) DateTimeUtils.format(firstPublication) else "-"
+        )
     }
 
     @Authorized

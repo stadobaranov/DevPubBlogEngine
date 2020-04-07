@@ -5,6 +5,7 @@ import devpub.blogengine.model.PostStatus
 import devpub.blogengine.model.entity.ModerationStatus
 import devpub.blogengine.model.entity.TagName
 import devpub.blogengine.model.entity.projection.ModeratedPostSummary
+import devpub.blogengine.model.entity.projection.PostStatistics
 import devpub.blogengine.model.entity.projection.PostSummary
 import devpub.blogengine.model.pagination.UnorderedPageable
 import org.springframework.data.domain.Page
@@ -48,4 +49,6 @@ interface PostRepositoryCustom {
         status: ModerationStatus,
         pageable: Pageable
     ): Page<ModeratedPostSummary>
+
+    fun findStatistics(userId: Int? = null): PostStatistics
 }

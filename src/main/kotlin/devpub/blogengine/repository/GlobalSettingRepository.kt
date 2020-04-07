@@ -8,6 +8,13 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface GlobalSettingRepository: BaseRepository<GlobalSetting> {
+    @Query("""
+        select gs
+        from GlobalSetting gs
+        where gs.code = :code
+    """)
+    fun findByCode(@Param("code") code: GlobalSetting.Code): GlobalSetting?
+
     @Modifying
     @Query("""
         update GlobalSetting gs

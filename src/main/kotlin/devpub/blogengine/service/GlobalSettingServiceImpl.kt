@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.EnumMap
 import javax.annotation.PostConstruct
+import kotlin.reflect.KClass
+import kotlin.reflect.full.cast
 
 @Service
 open class GlobalSettingServiceImpl @Autowired constructor(
@@ -60,20 +62,42 @@ open class GlobalSettingServiceImpl @Autowired constructor(
         }
     }
 
+    @Transactional(readOnly = true)
+    override fun <T: Any> getValue(code: GlobalSetting.Code, type: KClass<T>): T? {
+        val setting = globalSettingRepository.findByCode(code)
+
+        if(setting == null) {
+            error("Глобальная настройка с кодом \"$code\" не найдена")
+        }
+
+        val value = convertFromString(setting)
+
+        if(value == null) {
+            return null
+        }
+
+        try {
+            return type.cast(value)
+        }
+        catch(exception: TypeCastException) {
+            error("Не удалось преобразовать \"$value\" к \"${type.qualifiedName}\"")
+        }
+    }
+
     @Authorized(moderator = true)
     @Transactional(readOnly = true)
     override fun get(): GlobalSettingsResponse {
         val settings = globalSettingRepository.findAll()
 
         val settingValues = EnumMap<GlobalSetting.Code, Any?>(GlobalSetting.Code::class.java)
-        settings.associateTo(settingValues) { toPair(it) }
+        settings.associateTo(settingValues) { it.code to convertFromString(it) }
 
         return GlobalSettingsResponse(settingValues)
     }
 
-    private fun toPair(setting: GlobalSetting): Pair<GlobalSetting.Code, Any?> {
+    private fun convertFromString(setting: GlobalSetting): Any? {
         try {
-            return setting.code to globalSettingValueConverter.convertFromString(setting.code, setting.value)
+            return globalSettingValueConverter.convertFromString(setting.code, setting.value)
         }
         catch(exception: GlobalSettingValueConversionException) {
             error("Не удалось сконвертировать строку \"${setting.value}\" для кода \"${setting.code}\"")
