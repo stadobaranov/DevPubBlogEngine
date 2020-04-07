@@ -183,4 +183,9 @@ open class ApiGeneralController @Autowired constructor(
     open fun getPostStatisticsForAll(): PostStatisticsResponse {
         return postStatisticsService.getForAll()
     }
+
+    @GetMapping("statistics/my")
+    open fun getPostStatisticsForCurrentUser(): PostStatisticsResponse {
+        return postStatisticsService.getForCurrentUser()
+    }
 }
