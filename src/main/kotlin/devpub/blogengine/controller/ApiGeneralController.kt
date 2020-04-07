@@ -7,6 +7,7 @@ import devpub.blogengine.model.InitResponse
 import devpub.blogengine.model.ModeratePostRequest
 import devpub.blogengine.model.PostCountToDatesRequest
 import devpub.blogengine.model.PostCountToDatesResponse
+import devpub.blogengine.model.PostStatisticsResponse
 import devpub.blogengine.model.TagWeightToNamesRequest
 import devpub.blogengine.model.TagWeightToNamesResponse
 import devpub.blogengine.model.UpdateGlobalSettingsRequest
@@ -17,6 +18,7 @@ import devpub.blogengine.service.ExceptionHandlingService
 import devpub.blogengine.service.GlobalSettingService
 import devpub.blogengine.service.ImageUploadService
 import devpub.blogengine.service.PostService
+import devpub.blogengine.service.PostStatisticsService
 import devpub.blogengine.service.TagService
 import devpub.blogengine.service.UserProfileService
 import devpub.blogengine.service.ValidationErrorsResponseMaker
@@ -52,6 +54,7 @@ open class ApiGeneralController @Autowired constructor(
     private val globalSettingService: GlobalSettingService,
     private val userProfileService: UserProfileService,
     private val imageUploadService: ImageUploadService,
+    private val postStatisticsService: PostStatisticsService,
     private val validationErrorsResponseMaker: ValidationErrorsResponseMaker
 ) {
     @GetMapping("init")
@@ -174,5 +177,10 @@ open class ApiGeneralController @Autowired constructor(
                 UpdateUserProfileWithoutAvatarRequest::class, UpdateUserProfileWithoutAvatarRequest::email.name, exception.message!!
             )
         }
+    }
+
+    @GetMapping("statistics/all")
+    open fun getPostStatisticsForAll(): PostStatisticsResponse {
+        return postStatisticsService.getForAll()
     }
 }
