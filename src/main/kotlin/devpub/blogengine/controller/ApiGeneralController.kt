@@ -75,7 +75,7 @@ open class ApiGeneralController @Autowired constructor(
     @PostMapping("comment")
     open fun comment(@Valid @RequestBody request: CommentPostRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.make(CommentPostRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(CommentPostRequest::class, bResult.fieldErrors)
         }
 
         return postService.comment(request)
@@ -119,12 +119,10 @@ open class ApiGeneralController @Autowired constructor(
     open fun registerExceptionHandlerForUpdateUserProfileWithAvatar() {
         exceptionHandlingService.register("/api/profile/my") {
             exception, _, _ -> when(exception) {
-                is MaxUploadSizeExceededException -> ResponseEntity.ok(
-                    validationErrorsResponseMaker.make(
-                        UpdateUserProfileWithAvatarRequest::class,
-                        UpdateUserProfileWithAvatarRequest::avatar.name,
-                        ApplicationMessages.MAX_UPLOAD_SIZE_EXCEEDED
-                    )
+                is MaxUploadSizeExceededException -> validationErrorsResponseMaker.makeEntity(
+                    UpdateUserProfileWithAvatarRequest::class,
+                    UpdateUserProfileWithAvatarRequest::avatar.name,
+                    ApplicationMessages.MAX_UPLOAD_SIZE_EXCEEDED
                 )
                 else -> null
             }
@@ -137,19 +135,19 @@ open class ApiGeneralController @Autowired constructor(
         bResult: BindingResult
     ): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.make(CommentPostRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(UpdateUserProfileWithAvatarRequest::class, bResult.fieldErrors)
         }
 
         try {
             return userProfileService.update(request)
         }
         catch(exception: DuplicateUserNameException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 UpdateUserProfileWithAvatarRequest::class, UpdateUserProfileWithAvatarRequest::name.name, exception.message!!
             )
         }
         catch(exception: DuplicateUserEmailException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 UpdateUserProfileWithAvatarRequest::class, UpdateUserProfileWithAvatarRequest::email.name, exception.message!!
             )
         }
@@ -161,19 +159,19 @@ open class ApiGeneralController @Autowired constructor(
         bResult: BindingResult
     ): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.make(CommentPostRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(UpdateUserProfileWithoutAvatarRequest::class, bResult.fieldErrors)
         }
 
         try {
             return userProfileService.update(request)
         }
         catch(exception: DuplicateUserNameException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 UpdateUserProfileWithoutAvatarRequest::class, UpdateUserProfileWithoutAvatarRequest::name.name, exception.message!!
             )
         }
         catch(exception: DuplicateUserEmailException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 UpdateUserProfileWithoutAvatarRequest::class, UpdateUserProfileWithoutAvatarRequest::email.name, exception.message!!
             )
         }

@@ -62,19 +62,19 @@ open class ApiAuthController @Autowired constructor(
     @PostMapping("password")
     open fun recoverUserPassword(@Valid @RequestBody request: ResetUserPasswordRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.make(ResetUserPasswordRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(ResetUserPasswordRequest::class, bResult.fieldErrors)
         }
 
         try {
             return userPasswordResetService.reset(request)
         }
         catch(exception: ProcessingCaptchaException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 ResetUserPasswordRequest::class, ResetUserPasswordRequest::captchaCode.name, exception.message!!
             )
         }
         catch(exception: UserResetCodeExpiredException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 ResetUserPasswordRequest::class, ResetUserPasswordRequest::resetCode.name, exception.message!!
             )
         }
@@ -83,24 +83,24 @@ open class ApiAuthController @Autowired constructor(
     @PostMapping("register")
     open fun registerUser(@Valid @RequestBody request: RegisterUserRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.make(RegisterUserRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(RegisterUserRequest::class, bResult.fieldErrors)
         }
 
         try {
             return userRegistrationService.register(request)
         }
         catch(exception: ProcessingCaptchaException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 RegisterUserRequest::class, RegisterUserRequest::captchaCode.name, exception.message!!
             )
         }
         catch(exception: DuplicateUserNameException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 RegisterUserRequest::class, RegisterUserRequest::name.name, exception.message!!
             )
         }
         catch(exception: DuplicateUserEmailException) {
-            return validationErrorsResponseMaker.make(
+            return validationErrorsResponseMaker.makeEntity(
                 RegisterUserRequest::class, RegisterUserRequest::email.name, exception.message!!
             )
         }

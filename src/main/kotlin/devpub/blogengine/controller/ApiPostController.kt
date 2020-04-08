@@ -71,7 +71,7 @@ open class ApiPostController @Autowired constructor(
     @PostMapping
     open fun create(@Valid @RequestBody request: SavePostRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.make(SavePostRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(SavePostRequest::class, bResult.fieldErrors)
         }
 
         return postService.create(request)
@@ -84,7 +84,7 @@ open class ApiPostController @Autowired constructor(
         bResult: BindingResult
     ): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.make(SavePostRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(SavePostRequest::class, bResult.fieldErrors)
         }
 
         return postService.update(id, request)

@@ -14,7 +14,7 @@ import kotlin.reflect.jvm.javaField
 open class ValidationErrorsResponseMakerImpl: ValidationErrorsResponseMaker {
     private val requestParameterMappers = ConcurrentHashMap<KClass<*>, RequestParameterMapper>()
 
-    override fun make(requestType: KClass<out Any>, fieldErrors: List<FieldError>): ValidationErrorsResponse {
+    override fun make(requestType: KClass<*>, fieldErrors: List<FieldError>): ValidationErrorsResponse {
         val mapper = getMapper(requestType)
 
         return ValidationErrorsResponse(
@@ -22,7 +22,7 @@ open class ValidationErrorsResponseMakerImpl: ValidationErrorsResponseMaker {
         )
     }
 
-    override fun make(requestType: KClass<out Any>, fieldName: String, fieldError: String): ValidationErrorsResponse {
+    override fun make(requestType: KClass<*>, fieldName: String, fieldError: String): ValidationErrorsResponse {
         val mapper = getMapper(requestType)
 
         return ValidationErrorsResponse(
@@ -30,7 +30,7 @@ open class ValidationErrorsResponseMakerImpl: ValidationErrorsResponseMaker {
         )
     }
 
-    private fun getMapper(requestType: KClass<out Any>): RequestParameterMapper {
+    private fun getMapper(requestType: KClass<*>): RequestParameterMapper {
         var mapper = requestParameterMappers[requestType]
 
         if(mapper == null) {
@@ -42,14 +42,14 @@ open class ValidationErrorsResponseMakerImpl: ValidationErrorsResponseMaker {
         return mapper
     }
 
-    private fun createRequestParameterMapper(requestType: KClass<out Any>): RequestParameterMapper {
+    private fun createRequestParameterMapper(requestType: KClass<*>): RequestParameterMapper {
         val fieldNameOverrides = hashMapOf<String, String>()
         requestType.superclasses.forEach { fillFieldNameOverrides(it, fieldNameOverrides) }
         fillFieldNameOverrides(requestType, fieldNameOverrides)
         return RequestParameterMapper(fieldNameOverrides)
     }
 
-    private fun fillFieldNameOverrides(type: KClass<out Any>, fieldNameOverrides: MutableMap<String, String>) {
+    private fun fillFieldNameOverrides(type: KClass<*>, fieldNameOverrides: MutableMap<String, String>) {
         type.declaredMemberProperties.forEach {
             val javaField = it.javaField
 
