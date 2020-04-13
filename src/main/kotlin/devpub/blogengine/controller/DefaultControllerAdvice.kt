@@ -2,7 +2,6 @@ package devpub.blogengine.controller
 
 import devpub.blogengine.ApplicationMessages
 import devpub.blogengine.model.MessageResponse
-import devpub.blogengine.service.ExceptionHandlingService
 import devpub.blogengine.service.MaxUploadSizeExceededExceptionHandlingService
 import devpub.blogengine.service.exception.GlobalSettingValueConversionException
 import devpub.blogengine.service.exception.ModelIntegrityException
@@ -34,7 +33,6 @@ private val logger = LoggerFactory.getLogger(DefaultControllerAdvice::class.java
 
 @ControllerAdvice
 open class DefaultControllerAdvice @Autowired constructor(
-    private val exceptionHandlingService: ExceptionHandlingService,
     private val maxUploadSizeExceededExceptionHandlingService: MaxUploadSizeExceededExceptionHandlingService
 ) {
     @InitBinder
@@ -44,7 +42,7 @@ open class DefaultControllerAdvice @Autowired constructor(
 
     @ExceptionHandler(Exception::class)
     open fun handleException(exception: Exception, request: HttpServletRequest, response: HttpServletResponse): Any {
-        return exceptionHandlingService.handle(exception, request, response) ?: when(exception) {
+        return when(exception) {
             is UnauthorizedException -> buildResponseForUnauthorized()
             is ModelIntegrityException -> buildResponseForBadRequest()
             is ModelNotFoundException -> buildResponseForNotFound()
