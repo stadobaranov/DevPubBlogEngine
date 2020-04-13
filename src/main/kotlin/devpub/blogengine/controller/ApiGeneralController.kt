@@ -1,6 +1,7 @@
 package devpub.blogengine.controller
 
 import devpub.blogengine.ApplicationMessages
+import devpub.blogengine.controller.validation.buildMapper
 import devpub.blogengine.model.CommentPostRequest
 import devpub.blogengine.model.GlobalSettingsResponse
 import devpub.blogengine.model.InitResponse
@@ -134,15 +135,11 @@ open class ApiGeneralController @Autowired constructor(
         try {
             return userProfileService.update(request)
         }
-        catch(exception: DuplicateUserNameException) {
-            return validationErrorsResponseMaker.makeEntity(
-                UpdateUserProfileWithAvatarRequest::class, UpdateUserProfileWithAvatarRequest::name.name, exception.message!!
-            )
-        }
-        catch(exception: DuplicateUserEmailException) {
-            return validationErrorsResponseMaker.makeEntity(
-                UpdateUserProfileWithAvatarRequest::class, UpdateUserProfileWithAvatarRequest::email.name, exception.message!!
-            )
+        catch(exception: Exception) {
+            return validationErrorsResponseMaker.buildMapper(request.javaClass.kotlin)
+                .map(DuplicateUserNameException::class to UpdateUserProfileWithAvatarRequest::name)
+                .map(DuplicateUserEmailException::class to UpdateUserProfileWithAvatarRequest::email)
+                .makeResponseEntity(exception)
         }
     }
 
@@ -158,15 +155,11 @@ open class ApiGeneralController @Autowired constructor(
         try {
             return userProfileService.update(request)
         }
-        catch(exception: DuplicateUserNameException) {
-            return validationErrorsResponseMaker.makeEntity(
-                UpdateUserProfileWithoutAvatarRequest::class, UpdateUserProfileWithoutAvatarRequest::name.name, exception.message!!
-            )
-        }
-        catch(exception: DuplicateUserEmailException) {
-            return validationErrorsResponseMaker.makeEntity(
-                UpdateUserProfileWithoutAvatarRequest::class, UpdateUserProfileWithoutAvatarRequest::email.name, exception.message!!
-            )
+        catch(exception: Exception) {
+            return validationErrorsResponseMaker.buildMapper(request.javaClass.kotlin)
+                .map(DuplicateUserNameException::class to UpdateUserProfileWithoutAvatarRequest::name)
+                .map(DuplicateUserEmailException::class to UpdateUserProfileWithoutAvatarRequest::email)
+                .makeResponseEntity(exception)
         }
     }
 

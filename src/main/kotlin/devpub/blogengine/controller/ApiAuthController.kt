@@ -1,5 +1,6 @@
 package devpub.blogengine.controller
 
+import devpub.blogengine.controller.validation.buildMapper
 import devpub.blogengine.model.AuthorizedUserResponse
 import devpub.blogengine.model.GenerateCaptchaResponse
 import devpub.blogengine.model.LoginUserRequest
@@ -60,7 +61,7 @@ open class ApiAuthController @Autowired constructor(
     }
 
     @PostMapping("password")
-    open fun recoverUserPassword(@Valid @RequestBody request: ResetUserPasswordRequest, bResult: BindingResult): Any {
+    open fun resetUserPassword(@Valid @RequestBody request: ResetUserPasswordRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
             return validationErrorsResponseMaker.makeEntity(ResetUserPasswordRequest::class, bResult.fieldErrors)
         }
@@ -68,15 +69,11 @@ open class ApiAuthController @Autowired constructor(
         try {
             return userPasswordResetService.reset(request)
         }
-        catch(exception: ProcessingCaptchaException) {
-            return validationErrorsResponseMaker.makeEntity(
-                ResetUserPasswordRequest::class, ResetUserPasswordRequest::captchaCode.name, exception.message!!
-            )
-        }
-        catch(exception: UserResetCodeExpiredException) {
-            return validationErrorsResponseMaker.makeEntity(
-                ResetUserPasswordRequest::class, ResetUserPasswordRequest::resetCode.name, exception.message!!
-            )
+        catch(exception: Exception) {
+            return validationErrorsResponseMaker.buildMapper(request.javaClass.kotlin)
+                .map(ProcessingCaptchaException::class to ResetUserPasswordRequest::captchaCode)
+                .map(UserResetCodeExpiredException::class to ResetUserPasswordRequest::resetCode)
+                .makeResponseEntity(exception)
         }
     }
 
@@ -89,20 +86,12 @@ open class ApiAuthController @Autowired constructor(
         try {
             return userRegistrationService.register(request)
         }
-        catch(exception: ProcessingCaptchaException) {
-            return validationErrorsResponseMaker.makeEntity(
-                RegisterUserRequest::class, RegisterUserRequest::captchaCode.name, exception.message!!
-            )
-        }
-        catch(exception: DuplicateUserNameException) {
-            return validationErrorsResponseMaker.makeEntity(
-                RegisterUserRequest::class, RegisterUserRequest::name.name, exception.message!!
-            )
-        }
-        catch(exception: DuplicateUserEmailException) {
-            return validationErrorsResponseMaker.makeEntity(
-                RegisterUserRequest::class, RegisterUserRequest::email.name, exception.message!!
-            )
+        catch(exception: Exception) {
+            return validationErrorsResponseMaker.buildMapper(request.javaClass.kotlin)
+                .map(ProcessingCaptchaException::class to RegisterUserRequest::captchaCode)
+                .map(DuplicateUserNameException::class to RegisterUserRequest::name)
+                .map(DuplicateUserEmailException::class to RegisterUserRequest::email)
+                .makeResponseEntity(exception)
         }
     }
 }
