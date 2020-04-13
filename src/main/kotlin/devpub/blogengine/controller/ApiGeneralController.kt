@@ -14,9 +14,9 @@ import devpub.blogengine.model.UpdateGlobalSettingsRequest
 import devpub.blogengine.model.UpdateUserProfileWithAvatarRequest
 import devpub.blogengine.model.UpdateUserProfileWithoutAvatarRequest
 import devpub.blogengine.model.UploadImageRequest
-import devpub.blogengine.service.ExceptionHandlingService
 import devpub.blogengine.service.GlobalSettingService
 import devpub.blogengine.service.ImageUploadService
+import devpub.blogengine.service.MaxUploadSizeExceededExceptionHandlingService
 import devpub.blogengine.service.PostService
 import devpub.blogengine.service.PostStatisticsService
 import devpub.blogengine.service.TagService
@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MaxUploadSizeExceededException
 import javax.annotation.PostConstruct
 import javax.validation.Valid
 
@@ -48,7 +47,7 @@ open class ApiGeneralController @Autowired constructor(
     @Value("\${blog-engine.contact-email}") private val contactEmail: String,
     @Value("\${blog-engine.copyright}") private val copyright: String,
     @Value("\${blog-engine.copyright-from}") private val copyrightFrom: String,
-    private val exceptionHandlingService: ExceptionHandlingService,
+    private val maxUploadSizeExceededExceptionHandlingService: MaxUploadSizeExceededExceptionHandlingService,
     private val postService: PostService,
     private val tagService: TagService,
     private val globalSettingService: GlobalSettingService,
@@ -88,11 +87,8 @@ open class ApiGeneralController @Autowired constructor(
 
     @PostConstruct
     open fun registerExceptionHandlerForUploadImage() {
-        exceptionHandlingService.register("/api/image") {
-            exception, _, _ -> when(exception) {
-                is MaxUploadSizeExceededException -> ResponseEntity.badRequest().build<Any>()
-                else -> null
-            }
+        maxUploadSizeExceededExceptionHandlingService.registerSimpleHandler("post", "/api/image") {
+            return@registerSimpleHandler ResponseEntity.badRequest().build<Any>()
         }
     }
 
@@ -117,15 +113,12 @@ open class ApiGeneralController @Autowired constructor(
 
     @PostConstruct
     open fun registerExceptionHandlerForUpdateUserProfileWithAvatar() {
-        exceptionHandlingService.register("/api/profile/my") {
-            exception, _, _ -> when(exception) {
-                is MaxUploadSizeExceededException -> validationErrorsResponseMaker.makeEntity(
-                    UpdateUserProfileWithAvatarRequest::class,
-                    UpdateUserProfileWithAvatarRequest::avatar.name,
-                    ApplicationMessages.MAX_UPLOAD_SIZE_EXCEEDED
-                )
-                else -> null
-            }
+        maxUploadSizeExceededExceptionHandlingService.registerSimpleHandler("post", "/api/profile/my") {
+            return@registerSimpleHandler validationErrorsResponseMaker.makeEntity(
+                UpdateUserProfileWithAvatarRequest::class,
+                UpdateUserProfileWithAvatarRequest::avatar.name,
+                ApplicationMessages.MAX_UPLOAD_SIZE_EXCEEDED
+            )
         }
     }
 
