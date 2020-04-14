@@ -6,6 +6,7 @@ import devpub.blogengine.model.entity.GlobalSetting
 import devpub.blogengine.repository.GlobalSettingRepository
 import devpub.blogengine.service.aspect.Authorized
 import devpub.blogengine.service.exception.GlobalSettingValueConversionException
+import devpub.blogengine.service.properties.GlobalSettingProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,7 +17,7 @@ import kotlin.reflect.full.cast
 
 @Service
 open class GlobalSettingServiceImpl @Autowired constructor(
-    private val globalSettingDefinitionProvider: GlobalSettingDefinitionProvider,
+    private val globalSettingProperties: GlobalSettingProperties,
     private val globalSettingValueConverter: GlobalSettingValueConverter,
     private val globalSettingRepository: GlobalSettingRepository
 ): GlobalSettingService {
@@ -29,8 +30,13 @@ open class GlobalSettingServiceImpl @Autowired constructor(
         settings.associateByTo(settingToCodes) { it.code }
 
         for(code in GlobalSetting.Code.values()) {
+            val settingDefinition = globalSettingProperties.getDefinition(code)
+
+            if(settingDefinition == null) {
+                error("Определение глобальное настройки для кода \"$code\" не найдено")
+            }
+
             val setting = settingToCodes[code]
-            val settingDefinition = globalSettingDefinitionProvider.get(code)
 
             if(setting == null) {
                 val defaultValue = settingDefinition.defaultValue

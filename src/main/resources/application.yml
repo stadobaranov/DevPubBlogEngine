@@ -1,21 +1,25 @@
 blog-engine:
-  host: http://localhost:8080/
+  host:
+    baseUrl: http://localhost:8080/
 
   transaction-repeating:
     max-attempts: 50
     min-delay: 50
     max-delay: 200
 
-  captcha-lifetime: 60
+  captcha:
+    lifetime: 60
 
-  frontend-title: DevPub
-  frontend-subtitle: Рассказы разработчиков
-  contact-phone: +7 903 666-44-55
-  contact-email: mail@mail.ru
-  copyright: Дмитрий Сергеев
-  copyright-from: 2005
+  frontend:
+    title: DevPub
+    subtitle: Рассказы разработчиков
+    contact-phone: +7 903 666-44-55
+    contact-email: mail@mail.ru
+    copyright: Дмитрий Сергеев
+    copyright-from: 2005
 
-  upload-dir: upload/
+  upload:
+    directory: upload/
 
   global-settings:
     definitions:

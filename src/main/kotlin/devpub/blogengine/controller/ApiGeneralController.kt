@@ -25,8 +25,8 @@ import devpub.blogengine.service.UserProfileService
 import devpub.blogengine.service.ValidationErrorsResponseMaker
 import devpub.blogengine.service.exception.DuplicateUserEmailException
 import devpub.blogengine.service.exception.DuplicateUserNameException
+import devpub.blogengine.service.properties.FrontendProperties
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
@@ -43,12 +43,7 @@ private const val UPDATE_USER_PROFILE_URL = "/api/profile/my"
 
 @RestController
 open class ApiGeneralController @Autowired constructor(
-    @Value("\${blog-engine.frontend-title}") private val frontendTitle: String,
-    @Value("\${blog-engine.frontend-subtitle}") private val frontendSubTitle: String,
-    @Value("\${blog-engine.contact-phone}") private val contactPhone: String,
-    @Value("\${blog-engine.contact-email}") private val contactEmail: String,
-    @Value("\${blog-engine.copyright}") private val copyright: String,
-    @Value("\${blog-engine.copyright-from}") private val copyrightFrom: String,
+    private val frontendProperties: FrontendProperties,
     private val maxUploadSizeExceededExceptionHandlingService: MaxUploadSizeExceededExceptionHandlingService,
     private val postService: PostService,
     private val tagService: TagService,
@@ -60,7 +55,14 @@ open class ApiGeneralController @Autowired constructor(
 ) {
     @GetMapping("/api/init")
     open fun init(): InitResponse {
-        return InitResponse(frontendTitle, frontendSubTitle, contactPhone, contactEmail, copyright, copyrightFrom)
+        return InitResponse(
+            frontendProperties.title,
+            frontendProperties.subTitle,
+            frontendProperties.contactPhone,
+            frontendProperties.contactEmail,
+            frontendProperties.copyright,
+            frontendProperties.copyrightFrom
+        )
     }
 
     @GetMapping("/api/calendar")

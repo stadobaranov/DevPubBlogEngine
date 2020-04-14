@@ -2,8 +2,8 @@ package devpub.blogengine.service
 
 import devpub.blogengine.ApplicationMessages
 import devpub.blogengine.model.UserPasswordReset
+import devpub.blogengine.service.properties.EmailProperties
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
@@ -13,15 +13,15 @@ import java.nio.charset.StandardCharsets
 
 @Service
 open class EmailSenderImpl @Autowired constructor(
+    private val emailProperties: EmailProperties,
     private val javaEmailSender: JavaMailSender,
-    private val templateEngine: TemplateEngine,
-    @Value("\${spring.mail.username}") private val from: String
+    private val templateEngine: TemplateEngine
 ): EmailSender {
     override fun sendUserPasswordReset(userPasswordReset: UserPasswordReset) {
         val message = javaEmailSender.createMimeMessage()
         val messageHelper = MimeMessageHelper(message, StandardCharsets.UTF_8.name())
 
-        messageHelper.setFrom(from)
+        messageHelper.setFrom(emailProperties.username)
         messageHelper.setTo(userPasswordReset.userEmail)
         messageHelper.setSubject(ApplicationMessages.USER_PASSWORD_RESET_SUBJECT)
 

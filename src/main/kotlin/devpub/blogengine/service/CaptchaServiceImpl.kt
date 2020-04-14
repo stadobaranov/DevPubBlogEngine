@@ -6,8 +6,8 @@ import devpub.blogengine.model.entity.Captcha
 import devpub.blogengine.repository.CaptchaRepository
 import devpub.blogengine.service.exception.CaptchaExpiredException
 import devpub.blogengine.service.exception.InvalidCaptchaCodeException
+import devpub.blogengine.service.properties.CaptchaProperties
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,13 +20,13 @@ private const val CAPTCHA_IMAGE_FORMAT = "png"
 
 @Service
 open class CaptchaServiceImpl @Autowired constructor(
+    private val captchaProperties: CaptchaProperties,
     private val randomStringGenerator: RandomStringGenerator,
     private val captchaImageCreator: CaptchaImageCreator,
-    private val captchaRepository: CaptchaRepository,
-    @Value("\${blog-engine.captcha-lifetime}") private val lifetime: Long
+    private val captchaRepository: CaptchaRepository
 ): CaptchaService {
     private fun isExpired(createdAt: LocalDateTime): Boolean {
-        return createdAt.plusMinutes(lifetime) < LocalDateTime.now()
+        return createdAt.plusMinutes(captchaProperties.lifetime) < LocalDateTime.now()
     }
 
     @Transactional
@@ -49,7 +49,7 @@ open class CaptchaServiceImpl @Autowired constructor(
     }
 
     private fun deleteExpiredCodes() {
-        captchaRepository.deleteBefore(LocalDateTime.now().minusMinutes(lifetime))
+        captchaRepository.deleteBefore(LocalDateTime.now().minusMinutes(captchaProperties.lifetime))
     }
 
     private fun createAndEncodeImage(code: String): String {

@@ -1,8 +1,8 @@
 package devpub.blogengine.service
 
+import devpub.blogengine.service.properties.UploadProperties
 import devpub.blogengine.util.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -14,8 +14,8 @@ private const val FILE_NAME_LENGTH = 10
 
 @Service
 open class UploadStorageImpl @Autowired constructor(
-    @Value("\${blog-engine.upload-dir}") private val uploadDir: String,
-    private val randomStringGenerator: RandomStringGenerator
+        private val uploadProperties: UploadProperties,
+        private val randomStringGenerator: RandomStringGenerator
 ): UploadStorage {
     override fun store(file: MultipartFile): String {
         val extension = FileUtils.getExtension(file.originalFilename ?: error("Файл недоступен"))
@@ -25,7 +25,7 @@ open class UploadStorageImpl @Autowired constructor(
                           randomStringGenerator.generate(FOLDER_NAME_LENGTH) + File.separator +
                           randomStringGenerator.generate(FOLDER_NAME_LENGTH) + File.separator
 
-            val dir = uploadDir + subDirs
+            val dir = uploadProperties.directory + subDirs
 
             val fileName = randomStringGenerator.generate(FILE_NAME_LENGTH) +
                            if(extension != null) ".$extension" else ""
@@ -41,6 +41,6 @@ open class UploadStorageImpl @Autowired constructor(
     }
 
     override fun remove(filePath: String) {
-        Files.deleteIfExists(Path.of(uploadDir + filePath))
+        Files.deleteIfExists(Path.of(uploadProperties.directory + filePath))
     }
 }

@@ -1,11 +1,11 @@
 package devpub.blogengine.service
 
-import org.springframework.beans.factory.annotation.Value
+import devpub.blogengine.service.properties.HostProperties
 import org.springframework.stereotype.Service
 
 @Service
 open class UrlMakerImpl(
-    @Value("\${blog-engine.host}") private val basePath: String
+    private val hostProperties: HostProperties
 ): UrlMaker {
-    override fun make(relativePath: String) = "$basePath$relativePath"
+    override fun make(relativePath: String) = "${hostProperties.baseUrl}$relativePath"
 }
