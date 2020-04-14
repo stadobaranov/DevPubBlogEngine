@@ -22,12 +22,10 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("api/auth")
 open class ApiAuthController @Autowired constructor(
     private val captchaService: CaptchaService,
     private val userService: UserService,
@@ -35,32 +33,32 @@ open class ApiAuthController @Autowired constructor(
     private val userRegistrationService: UserRegistrationService,
     private val validationErrorsResponseMaker: ValidationErrorsResponseMaker
 ) {
-    @GetMapping("captcha")
+    @GetMapping("/api/auth/captcha")
     open fun generateCaptcha(): GenerateCaptchaResponse {
         return captchaService.generate()
     }
 
-    @GetMapping("check")
+    @GetMapping("/api/auth/check")
     open fun checkUserLoggedIn(): AuthorizedUserResponse {
         return userService.checkLoggedIn()
     }
 
-    @PostMapping("login")
+    @PostMapping("/api/auth/login")
     open fun loginUser(@Valid @RequestBody request: LoginUserRequest): AuthorizedUserResponse {
         return userService.login(request)
     }
 
-    @GetMapping("logout")
+    @GetMapping("/api/auth/logout")
     open fun logoutUser(): ResultResponse {
         return userService.logout()
     }
 
-    @PostMapping("restore")
+    @PostMapping("/api/auth/restore")
     open fun restoreUserPassword(@Valid @RequestBody request: SendUserResetCodeRequest): ResultResponse {
         return userPasswordResetService.sendResetCode(request)
     }
 
-    @PostMapping("password")
+    @PostMapping("/api/auth/password")
     open fun resetUserPassword(@Valid @RequestBody request: ResetUserPasswordRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
             return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)
@@ -77,7 +75,7 @@ open class ApiAuthController @Autowired constructor(
         }
     }
 
-    @PostMapping("register")
+    @PostMapping("/api/auth/register")
     open fun registerUser(@Valid @RequestBody request: RegisterUserRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
             return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)

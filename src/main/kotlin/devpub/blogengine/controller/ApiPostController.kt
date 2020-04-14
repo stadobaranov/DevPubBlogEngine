@@ -22,48 +22,46 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("api/post")
 open class ApiPostController @Autowired constructor(
     private val postPageService: PostPageService,
     private val postService: PostService,
     private val validationErrorsResponseMaker: ValidationErrorsResponseMaker
 ) {
-    @GetMapping
+    @GetMapping("/api/post")
     open fun getPage(request: PostPageRequest): PostPageResponse {
         return postPageService.get(request)
     }
 
-    @GetMapping("search")
+    @GetMapping("/api/post/search")
     open fun getPageBySearchQuery(request: PostPageBySearchQueryRequest): PostPageResponse {
         return postPageService.getBySearchQuery(request)
     }
 
-    @GetMapping("byDate")
+    @GetMapping("/api/post/byDate")
     open fun getPageByDate(@Valid request: PostPageByDateRequest): PostPageResponse {
         return postPageService.getByDate(request)
     }
 
-    @GetMapping("byTag")
+    @GetMapping("/api/post/byTag")
     open fun getPageByTag(@Valid request: PostPageByTagRequest): PostPageResponse {
         return postPageService.getByTag(request)
     }
 
-    @GetMapping("my")
+    @GetMapping("/api/post/my")
     open fun getPageForCurrentUser(request: PostPageForCurrentUserRequest): PostPageResponse {
         return postPageService.getForCurrentUser(request)
     }
 
-    @GetMapping("moderation")
+    @GetMapping("/api/post/moderation")
     open fun getPageForModeration(request: ModeratedPostPageRequest): ModeratedPostPageResponse {
         return postPageService.getForModeration(request)
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/api/post/{id}")
     open fun getDetails(@PathVariable("id") id: Int): DetailedPostResponse {
         return postService.getDetails(id)
     }
@@ -77,7 +75,7 @@ open class ApiPostController @Autowired constructor(
         return postService.create(request)
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/api/post/{id}")
     open fun update(
         @PathVariable("id") id: Int,
         @Valid @RequestBody request: SavePostRequest,
@@ -90,12 +88,12 @@ open class ApiPostController @Autowired constructor(
         return postService.update(id, request)
     }
 
-    @PostMapping("like")
+    @PostMapping("/api/post/like")
     open fun like(@Valid @RequestBody request: VotePostRequest): ResultResponse {
         return postService.like(request)
     }
 
-    @PostMapping("dislike")
+    @PostMapping("/api/post/dislike")
     open fun dislike(@Valid @RequestBody request: VotePostRequest): ResultResponse {
         return postService.dislike(request)
     }
