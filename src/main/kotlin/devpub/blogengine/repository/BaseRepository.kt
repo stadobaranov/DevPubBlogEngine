@@ -11,13 +11,12 @@ import javax.persistence.LockModeType
 
 @NoRepositoryBean
 interface BaseRepository<T: Persistent>: JpaRepository<T, Int> {
-    @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("""
-        select e.id 
+        select count(e.id) > 0
         from #{#entityName} e
         where e.id = :id
     """)
-    fun lockForShare(@Param("id") id: Int): Int?
+    fun checkExisting(@Param("id") id: Int): Boolean
 
     @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("""
@@ -26,14 +25,6 @@ interface BaseRepository<T: Persistent>: JpaRepository<T, Int> {
         where e.id = :id
     """)
     fun findAndLockForShare(@Param("id") id: Int): T?
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("""
-        select e.id 
-        from #{#entityName} e
-        where e.id = :id
-    """)
-    fun lockForUpdate(@Param("id") id: Int): Int?
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""

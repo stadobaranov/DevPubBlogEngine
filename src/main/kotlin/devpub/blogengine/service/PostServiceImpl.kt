@@ -155,7 +155,7 @@ open class PostServiceImpl @Autowired constructor(
     override fun create(request: SavePostRequest): ResultResponse {
         val authorId = getCurrentUserId()
 
-        if(userRepository.lockForShare(authorId) == null) {
+        if(!userRepository.checkExisting(authorId)) {
             throw MissingUserException(ApplicationMessages.MISSING_POST_AUTHOR)
         }
 
@@ -163,7 +163,11 @@ open class PostServiceImpl @Autowired constructor(
         post.author = User(authorId)
         post.moderationStatus = ModerationStatus.NEW
         fillPostFromRequest(post, request)
-        postRepository.save(post)
+
+        repeatIfThrown(DataIntegrityViolationException::class) {
+            postRepository.saveAndFlush(post)
+        }
+
         createTags(post, request.tags)
 
         return ResultResponse.of(true)
@@ -286,13 +290,13 @@ open class PostServiceImpl @Autowired constructor(
     override fun comment(request: CommentPostRequest): CommentPostResponse {
         val authorId = getCurrentUserId()
 
-        if(userRepository.lockForShare(authorId) == null) {
+        if(!userRepository.checkExisting(authorId)) {
             throw MissingUserException(ApplicationMessages.MISSING_COMMENT_AUTHOR)
         }
 
         val id = request.id
 
-        if(postRepository.lockForShare(id) == null) {
+        if(!postRepository.checkExisting(id)) {
             throw MissingPostException(ApplicationMessages.MISSING_POST)
         }
 
@@ -305,14 +309,18 @@ open class PostServiceImpl @Autowired constructor(
         val parentCommentId = request.parentCommentId
 
         if(PersistentUtils.isValidId(parentCommentId)) {
-            if(postCommentRepository.lockForShare(parentCommentId, id) == null) {
+            if(!postCommentRepository.checkExisting(parentCommentId, id)) {
                 throw MissingPostCommentException(ApplicationMessages.MISSING_PARENT_COMMENT)
             }
 
             comment.parent = PostComment(parentCommentId)
         }
 
-        return CommentPostResponse(postCommentRepository.save(comment).id)
+        repeatIfThrown(DataIntegrityViolationException::class) {
+            postCommentRepository.saveAndFlush(comment)
+        }
+
+        return CommentPostResponse(comment.id)
     }
 
     @Authorized(moderator = true)
@@ -320,7 +328,7 @@ open class PostServiceImpl @Autowired constructor(
     override fun moderate(request: ModeratePostRequest) {
         val moderatorId = getCurrentUserId()
 
-        if(userRepository.lockForShare(moderatorId) == null) {
+        if(!userRepository.checkExisting(moderatorId)) {
             throw MissingUserException(ApplicationMessages.MISSING_POST_MODERATOR)
         }
 
@@ -329,7 +337,13 @@ open class PostServiceImpl @Autowired constructor(
             ModerationDecision.DECLINE -> ModerationStatus.DECLINED
         }
 
-        if(postRepository.moderate(request.id, moderatorId, status) == 0) {
+        val affectedRows = repeatIfThrown(DataIntegrityViolationException::class) {
+            val affectedRows = postRepository.moderate(request.id, moderatorId, status)
+            postRepository.flush()
+            return@repeatIfThrown affectedRows
+        }
+
+        if(affectedRows == 0) {
             throw MissingPostException(ApplicationMessages.MISSING_POST)
         }
     }
@@ -364,10 +378,10 @@ open class PostServiceImpl @Autowired constructor(
             voteRepository.flush()
         }
 
-        if(userRepository.lockForShare(currentUserId) == null) {
+        if(!userRepository.checkExisting(currentUserId)) {
             throw MissingUserException(ApplicationMessages.MISSING_POST_VOTER)
         }
-        else if(postRepository.lockForShare(postId) == null) {
+        else if(!postRepository.checkExisting(postId)) {
             throw MissingPostException(ApplicationMessages.MISSING_POST)
         }
 

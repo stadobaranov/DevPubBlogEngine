@@ -131,18 +131,16 @@ open class UserServiceImpl @Autowired constructor(
 
     @Transactional
     override fun generateResetCode(email: String): UserPasswordReset {
-        val user = userRepository.findAndLockForUpdateByEmail(email)
+        val user = userRepository.findByEmail(email)
 
         if(user == null) {
             throw UserNotFoundException(ApplicationMessages.USER_NOT_FOUND)
         }
 
-        if(user.resetCode == null) {
-            user.resetCode = randomStringGenerator.generate(User.RESET_CODE_LENGTH)
+        user.resetCode = randomStringGenerator.generate(User.RESET_CODE_LENGTH)
 
-            repeatIfThrown(DataIntegrityViolationException::class) {
-                userRepository.saveAndFlush(user)
-            }
+        repeatIfThrown(DataIntegrityViolationException::class) {
+            userRepository.saveAndFlush(user)
         }
 
         return UserPasswordReset(user.name, user.email, urlMaker.make("$CHANGE_PASSWORD_BASE_URL${user.resetCode!!}"))
