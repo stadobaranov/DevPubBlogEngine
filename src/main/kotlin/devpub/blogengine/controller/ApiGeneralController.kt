@@ -75,7 +75,7 @@ open class ApiGeneralController @Autowired constructor(
     @PostMapping("comment")
     open fun comment(@Valid @RequestBody request: CommentPostRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.makeEntity(CommentPostRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)
         }
 
         return postService.comment(request)
@@ -117,7 +117,7 @@ open class ApiGeneralController @Autowired constructor(
         maxUploadSizeExceededExceptionHandlingService.registerSimpleHandler("post", "/api/profile/my") {
             return@registerSimpleHandler validationErrorsResponseMaker.makeEntity(
                 UpdateUserProfileWithAvatarRequest::class,
-                UpdateUserProfileWithAvatarRequest::avatar.name,
+                UpdateUserProfileWithAvatarRequest::avatar,
                 ApplicationMessages.MAX_UPLOAD_SIZE_EXCEEDED
             )
         }
@@ -129,7 +129,7 @@ open class ApiGeneralController @Autowired constructor(
         bResult: BindingResult
     ): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.makeEntity(UpdateUserProfileWithAvatarRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)
         }
 
         try {
@@ -149,7 +149,7 @@ open class ApiGeneralController @Autowired constructor(
         bResult: BindingResult
     ): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.makeEntity(UpdateUserProfileWithoutAvatarRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)
         }
 
         try {

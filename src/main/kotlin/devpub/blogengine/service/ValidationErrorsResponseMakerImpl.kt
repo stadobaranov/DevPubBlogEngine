@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import org.springframework.validation.FieldError
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.superclasses
 import kotlin.reflect.jvm.javaField
@@ -22,11 +23,11 @@ open class ValidationErrorsResponseMakerImpl: ValidationErrorsResponseMaker {
         )
     }
 
-    override fun make(requestType: KClass<*>, fieldName: String, fieldError: String): ValidationErrorsResponse {
+    override fun <R: Any> make(requestType: KClass<R>, field: KProperty1<R, *>, fieldError: String): ValidationErrorsResponse {
         val mapper = getMapper(requestType)
 
         return ValidationErrorsResponse(
-            mapper.map(fieldName), fieldError
+            mapper.map(field.name), fieldError
         )
     }
 

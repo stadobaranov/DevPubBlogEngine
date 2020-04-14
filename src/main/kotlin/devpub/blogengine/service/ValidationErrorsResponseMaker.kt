@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 
 interface ValidationErrorsResponseMaker {
     fun makeEntity(
@@ -17,14 +18,14 @@ interface ValidationErrorsResponseMaker {
 
     fun make(requestType: KClass<*>, fieldErrors: List<FieldError>): ValidationErrorsResponse
 
-    fun makeEntity(
-        requestType: KClass<*>,
-        fieldName: String,
+    fun <R: Any> makeEntity(
+        requestType: KClass<R>,
+        field: KProperty1<R, *>,
         fieldError: String,
         status: HttpStatus = HttpStatus.BAD_REQUEST
     ): ResponseEntity<ValidationErrorsResponse> {
-        return ResponseEntity.status(status).body(make(requestType, fieldName, fieldError))
+        return ResponseEntity.status(status).body(make(requestType, field, fieldError))
     }
 
-    fun make(requestType: KClass<*>, fieldName: String, fieldError: String): ValidationErrorsResponse
+    fun <R: Any> make(requestType: KClass<R>, field: KProperty1<R, *>, fieldError: String): ValidationErrorsResponse
 }

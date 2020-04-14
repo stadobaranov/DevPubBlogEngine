@@ -63,7 +63,7 @@ open class ApiAuthController @Autowired constructor(
     @PostMapping("password")
     open fun resetUserPassword(@Valid @RequestBody request: ResetUserPasswordRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.makeEntity(ResetUserPasswordRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)
         }
 
         try {
@@ -80,7 +80,7 @@ open class ApiAuthController @Autowired constructor(
     @PostMapping("register")
     open fun registerUser(@Valid @RequestBody request: RegisterUserRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
-            return validationErrorsResponseMaker.makeEntity(RegisterUserRequest::class, bResult.fieldErrors)
+            return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)
         }
 
         try {

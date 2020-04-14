@@ -23,18 +23,18 @@ class ExceptionToValidationErrorsMapper<R: Any>(
 
     fun makeResponseEntity(exception: Exception): ResponseEntity<ValidationErrorsResponse> {
         return makeResponse(exception) {
-            requestType, fieldName, fieldError ->
-                return@makeResponse validationErrorsResponseMaker.makeEntity(requestType, fieldName, fieldError)
+            requestType, field, fieldError ->
+                return@makeResponse validationErrorsResponseMaker.makeEntity(requestType, field, fieldError)
         }
     }
 
-    private fun <R> makeResponse(
+    private fun <T> makeResponse(
         exception: Exception,
-        maker: (requestType: KClass<*>, fieldName: String, fieldError: String) -> R
-    ): R {
+        maker: (requestType: KClass<R>, field: KProperty1<R, *>, fieldError: String) -> T
+    ): T {
         exceptionTypeToFields.forEach {
             if(it.first.isInstance(exception)) {
-                return maker(requestType, it.second.name, exception.message!!)
+                return maker(requestType, it.second, exception.message!!)
             }
         }
 
