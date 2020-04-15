@@ -7,7 +7,7 @@ import devpub.blogengine.model.entity.TagName
 import devpub.blogengine.model.entity.projection.ModeratedPostSummary
 import devpub.blogengine.model.entity.projection.PostStatistics
 import devpub.blogengine.model.entity.projection.PostSummary
-import devpub.blogengine.model.pagination.UnorderedPageable
+import devpub.blogengine.model.pagination.UnorderedPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import java.time.LocalDate
@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 
 interface PostRepositoryCustom {
     fun findPageSummaries(
-        pageable: UnorderedPageable,
+        pagination: UnorderedPagination,
         order: PostOrder,
         publishedBefore: LocalDateTime = LocalDateTime.now()
     ): Page<PostSummary>

@@ -14,7 +14,7 @@ import devpub.blogengine.model.entity.User
 import devpub.blogengine.model.entity.projection.ModeratedPostSummary
 import devpub.blogengine.model.entity.projection.PostStatistics
 import devpub.blogengine.model.entity.projection.PostSummary
-import devpub.blogengine.model.pagination.UnorderedPageable
+import devpub.blogengine.model.pagination.UnorderedPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import java.time.LocalDate
@@ -46,7 +46,7 @@ open class PostRepositoryImpl(
     @PersistenceContext private val entityManager: EntityManager
 ): PostRepositoryCustom {
     override fun findPageSummaries(
-        pageable: UnorderedPageable,
+        pagination: UnorderedPagination,
         order: PostOrder,
         publishedBefore: LocalDateTime
     ): Page<PostSummary> {
@@ -75,7 +75,7 @@ open class PostRepositoryImpl(
         val query = entityManager.createQuery(jpql, PostSummary::class.java)
                                  .setParameter("publishedBefore", publishedBefore)
 
-        return RepositoryUtils.loadPage(query, pageable) {
+        return RepositoryUtils.loadPage(query, pagination) {
             val countJpql = """
                 select count(p)
                 from Post p
