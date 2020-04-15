@@ -29,7 +29,7 @@ data class Pagination(
     }
 
     override fun hasPrevious(): Boolean {
-        return offset > limit
+        return offset >= limit
     }
 
     override fun first(): Pagination {

@@ -19,7 +19,7 @@ data class UnorderedPagination(
     }
 
     override fun hasPrevious(): Boolean {
-        return offset > limit
+        return offset >= limit
     }
 
     override fun first(): UnorderedPagination {
