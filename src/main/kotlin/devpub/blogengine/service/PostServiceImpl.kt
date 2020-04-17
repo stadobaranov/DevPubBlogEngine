@@ -48,6 +48,7 @@ import java.time.Month
 
 @Service
 open class PostServiceImpl @Autowired constructor(
+    private val prettyTimeFormatter: PrettyTimeFormatter,
     private val authorizationService: AuthorizationService,
     private val postRepository: PostRepository,
     private val postCommentRepository: PostCommentRepository,
@@ -98,7 +99,7 @@ open class PostServiceImpl @Autowired constructor(
                 it.id,
                 it.text,
                 DetailedPostResponse.Comment.Author(it.authorId, it.authorName, it.authorAvatar),
-                DateTimeUtils.format(it.createdAt)
+                prettyTimeFormatter.format(it.createdAt)
             )
         }
 
