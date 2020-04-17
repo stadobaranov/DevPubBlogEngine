@@ -51,6 +51,14 @@ interface PostRepository: BaseRepository<Post>, PostRepositoryCustom {
 
     @Modifying
     @Query("""
+        update Post p
+        set p.viewCount = p.viewCount + 1
+        where p.id = :id
+    """)
+    fun incrementViews(@Param("id") id: Int): Int
+
+    @Modifying
+    @Query("""
         update Post p 
         set 
             p.moderator.id = :moderatorId,

@@ -64,28 +64,32 @@ open class PostServiceImpl @Autowired constructor(
         return authorizationService.getCurrentUserOrThrowUnauthorizedException()
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     override fun getDetails(id: Int): DetailedPostResponse {
         val details = postRepository.findDetailedSummary(id)
 
         if(details != null) {
+            val currentUser = authorizationService.getCurrentUser()
+
+            if(currentUser != null) {
+                if(details.isActive && currentUser.isModerator || currentUser.id == details.authorId) {
+                    return getDetailedResponse(details)
+                }
+            }
+
             val now = LocalDateTime.now()
 
             if(details.isActive && details.moderationStatus == ModerationStatus.ACCEPTED && details.publishedAt <= now) {
+                incrementViews(details.id)
                 return getDetailedResponse(details)
-            }
-            else {
-                val currentUser = authorizationService.getCurrentUser()
-
-                if(currentUser != null) {
-                    if(details.isActive && currentUser.isModerator || currentUser.id == details.authorId) {
-                        return getDetailedResponse(details)
-                    }
-                }
             }
         }
 
         throw PostNotFoundException(ApplicationMessages.POST_NOT_FOUND)
+    }
+
+    private fun incrementViews(id: Int) {
+        postRepository.incrementViews(id)
     }
 
     private fun getDetailedResponse(details: DetailedPostSummary): DetailedPostResponse {
