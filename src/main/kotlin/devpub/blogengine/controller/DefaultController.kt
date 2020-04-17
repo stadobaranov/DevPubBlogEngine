@@ -5,6 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping
 
 @Controller
 open class DefaultController {
-    @GetMapping
+    @GetMapping("/")
     open fun index() = "forward:/index.html"
 }

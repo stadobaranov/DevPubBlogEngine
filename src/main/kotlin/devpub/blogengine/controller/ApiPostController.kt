@@ -66,7 +66,7 @@ open class ApiPostController @Autowired constructor(
         return postService.getDetails(id)
     }
 
-    @PostMapping
+    @PostMapping("api/post")
     open fun create(@Valid @RequestBody request: SavePostRequest, bResult: BindingResult): Any {
         if(bResult.hasFieldErrors()) {
             return validationErrorsResponseMaker.makeEntity(request.javaClass.kotlin, bResult.fieldErrors)
