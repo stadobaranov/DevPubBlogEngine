@@ -90,7 +90,6 @@ open class GlobalSettingServiceImpl @Autowired constructor(
         }
     }
 
-    @Authorized(moderator = true)
     @Transactional(readOnly = true)
     override fun get(): GlobalSettingsResponse {
         val settings = globalSettingRepository.findAll()
